@@ -234,3 +234,5 @@ class Clase2(APIView):
     #         return JsonResponse({"estado":"ok", "mensaje":"Se elimina el registro exitosamente"}, status=HTTPStatus.OK)
     #     except Categoria.DoesNotExist:
     #         raise Http404
+    
+    # Test Commit
