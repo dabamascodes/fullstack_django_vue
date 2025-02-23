@@ -4,6 +4,9 @@ from django.http.response import JsonResponse
 from http import HTTPStatus
 from datetime import datetime
 
+# Llamamos a utilidades
+from utilidades import utilidades
+
 # Create your views here.
 class Clase1(APIView):
     
