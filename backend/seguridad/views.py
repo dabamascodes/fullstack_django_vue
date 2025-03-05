@@ -3,6 +3,9 @@ from django.http.response import JsonResponse
 from django.http import Http404
 from http import HTTPStatus
 from django.contrib.auth.models import User
+import uuid
+import os
+from dotenv import load_dotenv
 
 from .models import *
 
@@ -21,4 +24,9 @@ class Clase1(APIView):
         
         if User.objects.filter(email=request.data["correo"]).exists():
             return JsonResponse({"estado":"error", "mensaje":f"El correo {request.data["correo"]} no está disponible"}, status=HTTPStatus.BAD_REQUEST)
+        
+        
+        token = uuid.uuid4()
+        url = f"{os.getenv("BASE_URL")}api/v1/seguridad/verificacion/{token}"
+        print(url)
         
