@@ -8,6 +8,7 @@ import os
 from dotenv import load_dotenv
 
 from .models import *
+from utilidades import utilidades
 
 # Create your views here.
 
@@ -39,6 +40,18 @@ class Clase1(APIView):
                 is_active = 0
             )
             UsersMetadata.objects.create(token=token, user_id=u.id)
+            
+            html=f"""
+            <h3>Verificación de cuenta</h3>
+            Hola {request.data["nombre"]} te haz registrado exitosamente. Para activar tu cuenta haz click en el siguiente enlace:<br/>
+            <a href="{url}">{url}</a> 
+            <br/>
+            o copia y pega la siguiente URL en tu navegador favorito:
+            <br/>
+            {url}
+            """
+            utilidades.sendMail(html, "Verificación", request.data["correo"])
+            
         except Exception as e:
             return JsonResponse({"estado":"error", "mensaje":"Ocurrió un error inesperado"}, status=HTTPStatus.BAD_REQUEST)
         
