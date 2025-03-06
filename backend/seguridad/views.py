@@ -28,5 +28,18 @@ class Clase1(APIView):
         
         token = uuid.uuid4()
         url = f"{os.getenv("BASE_URL")}api/v1/seguridad/verificacion/{token}"
-        print(url)
+        try:
+            # Sólo para User de Django Admin
+            u=User.objects.create_user(
+                username=request.data["correo"], 
+                password=request.data["password"],
+                email=request.data["correo"],
+                first_name=request.data["nombre"],
+                last_name="",
+                is_active = 0
+            )
+            UsersMetadata.objects.create(token=token, user_id=u.id)
+        except Exception as e:
+            return JsonResponse({"estado":"error", "mensaje":"Ocurrió un error inesperado"}, status=HTTPStatus.BAD_REQUEST)
         
+        return JsonResponse({"estado":"ok", "mensaje":"Se crea el registro exitosamente"}, status=HTTPStatus.CREATED)
