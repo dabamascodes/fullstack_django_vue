@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from django.http.response import JsonResponse
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from http import HTTPStatus
 from django.contrib.auth.models import User
 import uuid
@@ -56,3 +56,24 @@ class Clase1(APIView):
             return JsonResponse({"estado":"error", "mensaje":"Ocurrió un error inesperado"}, status=HTTPStatus.BAD_REQUEST)
         
         return JsonResponse({"estado":"ok", "mensaje":"Se crea el registro exitosamente"}, status=HTTPStatus.CREATED)
+    
+    
+    
+    
+class Clase2(APIView):
+    
+    def get(self, request, token):
+        if token==None or not token:
+            return JsonResponse({"estado":"error", "mensaje":"Recurso no disponible"}, status=404)
+        
+        
+        try:
+            data=UsersMetadata.objects.filter(token=token).filter(user__is_active=0).get()
+            
+            UsersMetadata.objects.filter(token=token).update(token="")
+            
+            User.objects.filter(id=data.user_id).update(is_active=1)
+            
+            return HttpResponseRedirect(os.getenv("BASE_URL_FRONTEND"))
+        except UsersMetadata.DoesNotExist:
+            raise Http404
