@@ -6,9 +6,11 @@ from django.contrib.auth.models import User
 import uuid
 import os
 from dotenv import load_dotenv
+from django.contrib.auth import authenticate
 
 from .models import *
 from utilidades import utilidades
+
 
 # Create your views here.
 
@@ -77,3 +79,31 @@ class Clase2(APIView):
             return HttpResponseRedirect(os.getenv("BASE_URL_FRONTEND"))
         except UsersMetadata.DoesNotExist:
             raise Http404
+        
+        
+        
+        
+        
+class Clase3(APIView):
+    
+    def post(self, request):
+        
+        if request.data.get("correo")==None or not request.data.get("correo"):
+            return JsonResponse({"estado":"error", "mensaje":"El campo correo es obligatorio"}, status=HTTPStatus.BAD_REQUEST)
+        if request.data.get("password")==None or not request.data.get("password"):
+            return JsonResponse({"estado":"error", "mensaje":"El campo password es obligatorio"}, status=HTTPStatus.BAD_REQUEST)
+        
+        
+        # select * from auth_user where correo = correo;
+        try:
+            user = User.objects.filter(email=request.data["correo"]).get()
+            
+        except User.DoesNotExist:
+            return JsonResponse({"estado":"error", "mensaje":"Recurso no disponible"}, status=HTTPStatus.NOT_FOUND)
+        
+        
+        auth = authenticate(request, username=request.data.get("correo"), password=request.data.get("password"))
+        if auth is not None:
+            pass
+        else:
+            return JsonResponse({"estado":"error", "mensaje":"Las credenciales ingresadas no son válidas"}, status=HTTPStatus.BAD_REQUEST)
