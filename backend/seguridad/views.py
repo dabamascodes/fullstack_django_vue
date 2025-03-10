@@ -7,6 +7,10 @@ import uuid
 import os
 from dotenv import load_dotenv
 from django.contrib.auth import authenticate
+from jose import jwt
+from django.conf import settings
+from datetime import datetime, timedelta
+import time
 
 from .models import *
 from utilidades import utilidades
@@ -104,6 +108,49 @@ class Clase3(APIView):
         
         auth = authenticate(request, username=request.data.get("correo"), password=request.data.get("password"))
         if auth is not None:
-            pass
+            fecha = datetime.now()
+            despues = fecha + timedelta(days=1)
+            fecha_numero = int(datetime.timestamp(despues))
+            payload = {
+                "id":user.id,
+                "ISS":os.getenv("BASE_URL"),
+                "iat":int(time.time()),
+                "exp":int(fecha_numero)
+            }
+            try:
+                token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS512')
+                return JsonResponse({"id":user.id, "nombre":user.first_name, "token":token})
+            except Exception as e:
+                return JsonResponse({"estado":"error", "mensaje":"Ocurrió un error inesperado"}, status=HTTPStatus.BAD_REQUEST)
         else:
             return JsonResponse({"estado":"error", "mensaje":"Las credenciales ingresadas no son válidas"}, status=HTTPStatus.BAD_REQUEST)
+        
+        
+        
+        
+        
+        
+# Template 
+# class Clase3(APIView):
+    
+#     def post(self, request):
+        
+#         if request.data.get("correo")==None or not request.data.get("correo"):
+#             return JsonResponse({"estado":"error", "mensaje":"El campo correo es obligatorio"}, status=HTTPStatus.BAD_REQUEST)
+#         if request.data.get("password")==None or not request.data.get("password"):
+#             return JsonResponse({"estado":"error", "mensaje":"El campo password es obligatorio"}, status=HTTPStatus.BAD_REQUEST)
+        
+        
+#         # select * from auth_user where correo = correo;
+#         try:
+#             user = User.objects.filter(email=request.data["correo"]).get()
+            
+#         except User.DoesNotExist:
+#             return JsonResponse({"estado":"error", "mensaje":"Recurso no disponible"}, status=HTTPStatus.NOT_FOUND)
+        
+        
+#         auth = authenticate(request, username=request.data.get("correo"), password=request.data.get("password"))
+#         if auth is not None:
+#             pass
+#         else:
+#             return JsonResponse({"estado":"error", "mensaje":"Las credenciales ingresadas no son válidas"}, status=HTTPStatus.BAD_REQUEST)
