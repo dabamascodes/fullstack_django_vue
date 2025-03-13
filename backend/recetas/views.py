@@ -12,6 +12,8 @@ from datetime import datetime
 from django.core.files.storage import FileSystemStorage
 from seguridad.decorators import logueado
 
+from jose import jwt
+from django.conf import settings
 
 # Create your views here.
 class Clase1(APIView):
@@ -96,8 +98,8 @@ class Clase1(APIView):
             except Exception as e:
                 return JsonResponse({"estado":"error", "mensaje":f"Se produjo un error al intentar subir el archivo"}, status=HTTPStatus.BAD_REQUEST)   
 
-
-            
+            header = request.headers.get('Authorization').split(" ")
+            resuelto=jwt.decode(header[1], settings.SECRET_KEY, algorithms=['HS512'])
             try:
                 Receta.objects.create(
                     nombre=request.data["nombre"],
@@ -105,7 +107,8 @@ class Clase1(APIView):
                     descripcion=request.data["descripcion"],
                     categoria_id=request.data["categoria_id"],
                     fecha=datetime.now(),
-                    foto=foto
+                    foto=foto,
+                    user_id=resuelto["id"]
                 )
                 return JsonResponse({"estado":"ok", "mensaje":"Se crea el registro exitosamente"}, status=HTTPStatus.CREATED)
             except Exception as e:

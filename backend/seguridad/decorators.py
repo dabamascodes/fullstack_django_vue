@@ -14,6 +14,7 @@ def logueado():
                 return JsonResponse({"estado":"error", "mensaje":"No autorizado"}, status=HTTPStatus.UNAUTHORIZED)
             header = req.headers.get('Authorization').split(" ")
             try:
+                # Agregar Validación para comprobar sí el usuario está activo
                 resuelto=jwt.decode(header[1], settings.SECRET_KEY, algorithms=['HS512'])
             except Exception as e:
                 return JsonResponse({"estado":"error", "mensaje":"No autorizado"}, status=HTTPStatus.UNAUTHORIZED)
