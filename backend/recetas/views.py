@@ -114,7 +114,7 @@ class Clase1(APIView):
             except Exception as e:
                 raise Http404
             
-        return JsonResponse({"estado":"error", "mensaje":"La foto sólo puede ser PNG y JPG"})
+        return JsonResponse({"estado":"error", "mensaje":"La foto sólo puede ser PNG y JPG"}, status=HTTPStatus.BAD_REQUEST)
 
 
 
