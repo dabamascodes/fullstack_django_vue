@@ -4,7 +4,7 @@ from http import HTTPStatus
 from django.http import Http404
 from django.contrib.auth.models import User
 
-
+from django.utils.dateformat import DateFormat
 from dotenv import load_dotenv
 import os
 from datetime import datetime
@@ -19,6 +19,8 @@ from recetas.models import *
 
 class Clase1(APIView):   
      
+     
+    @logueado() 
     def post(self, request):
         if request.data.get("id")==None or not request.data.get("id"):
             return JsonResponse({"estado":"error", "mensaje":"El campo id es obligatorio"}, status=HTTPStatus.BAD_REQUEST)
@@ -54,6 +56,30 @@ class Clase1(APIView):
             
         else:
             return JsonResponse({"estado":"error", "mensaje":"La foto sólo puede ser PNG y JPG"}, status=HTTPStatus.BAD_REQUEST)
+        
+
+class Clase2(APIView):
+
+
+    def get(self, request, slug):
+        try:
+            data = Receta.objects.filter(slug = slug).get()
+            return JsonResponse({
+                "data":
+                    {
+                        "id" : data.id, 
+                        "nombre" : data.nombre, 
+                        "slug" : data.slug,
+                        "tiempo" : data.tiempo,
+                        "descripcion" : data.descripcion,
+                        "fecha" : DateFormat(data.fecha).format('y/m/Y'),
+                        "categoria_id" : data.categoria_id,
+                        "categoria" : data.categoria.nombre,
+                        "imagen" : f"{os.getenv("BASE_URL")}uploads/recetas/{data.foto}"   
+                    }}, status = HTTPStatus.OK)
+        except Categoria.DoesNotExist:
+            # raise Http404
+            return JsonResponse({"estado":"error", "mensaje":"Recurso no disponible"}, status=HTTPStatus.NOT_FOUND)
     
     
 class Clase4(APIView):
