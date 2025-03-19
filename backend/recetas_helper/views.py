@@ -80,6 +80,17 @@ class Clase2(APIView):
         except Categoria.DoesNotExist:
             # raise Http404
             return JsonResponse({"estado":"error", "mensaje":"Recurso no disponible"}, status=HTTPStatus.NOT_FOUND)
+        
+        
+class Clase3(APIView):
+    
+    
+    def get(self, request):
+        data = Receta.objects.order_by('?').all()[:3]  # select * from recetas order by rand() limit 3
+        datos_json = RecetaSerializer(data, many = True)
+        return JsonResponse({"data" : datos_json.data}, status = HTTPStatus.OK)
+        
+        
     
     
 class Clase4(APIView):
