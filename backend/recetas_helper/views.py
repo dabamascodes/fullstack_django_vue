@@ -75,7 +75,9 @@ class Clase2(APIView):
                         "fecha" : DateFormat(data.fecha).format('y/m/Y'),
                         "categoria_id" : data.categoria_id,
                         "categoria" : data.categoria.nombre,
-                        "imagen" : f"{os.getenv("BASE_URL")}uploads/recetas/{data.foto}"   
+                        "imagen" : f"{os.getenv("BASE_URL")}uploads/recetas/{data.foto}",
+                        "user_id": data.user_id,
+                        "user":data.user.first_name      
                     }}, status = HTTPStatus.OK)
         except Categoria.DoesNotExist:
             # raise Http404
