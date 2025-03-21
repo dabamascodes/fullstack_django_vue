@@ -14,6 +14,7 @@ from django.core.files.storage import FileSystemStorage
 from seguridad.decorators import logueado
 from recetas.serializers import *
 from recetas.models import *
+from categorias.models import *
 
 # Create your views here.
 
@@ -109,3 +110,21 @@ class Clase4(APIView):
         data = Receta.objects.filter(user_id=id).order_by('-id').all()
         datos_json=RecetaSerializer(data, many=True)
         return JsonResponse({"data":datos_json.data}, status=HTTPStatus.OK)
+    
+    
+class Clase5(APIView):
+    
+    
+    def get(self, request):
+        if request.GET.get("categoria_id")==None or not request.GET.get("categoria_id"):
+            return JsonResponse({"estado" : "error", "mensaje" : "Ocurrió un error inesperado" }, status=HTTPStatus.BAD_REQUEST)
+        
+        try:
+            existe = Categoria.objects.filter(id=request.GET.get("categoria_id")).get()            
+        except Categoria.DoesNotExist:
+            return JsonResponse({"estado" : "error", "mensaje" : "Ocurrió un error inesperado" }, status=HTTPStatus.BAD_REQUEST)
+            
+        
+        data = Receta.objects.filter(categoria_id=request.GET.get("categoria_id")).filter(nombre__icontains=request.GET.get('search')).order_by('-id').all()  # select * from recetas where categoria_id = and nombre like '%algo%'
+        datos_json = RecetaSerializer(data, many = True)
+        return JsonResponse({"data" : datos_json.data}, status = HTTPStatus.OK)
