@@ -8,10 +8,32 @@ from datetime import datetime, timezone
 # Llamamos a utilidades
 from utilidades import utilidades
 
+
+# swagger
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 # Create your views here.
 class Clase1(APIView):
     
-    
+    @swagger_auto_schema(
+        operation_description="Endpoint para Contacto",
+        responses = {
+            200: "Success",
+            400: "Bad request"
+        },
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'nombre':openapi.Schema(type=openapi.TYPE_STRING, description="Nombre"),
+                'correo':openapi.Schema(type=openapi.TYPE_STRING, description="E-Mail"),
+                'telefono':openapi.Schema(type=openapi.TYPE_STRING, description="Télefono"),
+                'mensaje':openapi.Schema(type=openapi.TYPE_STRING, description="Mensaje"),
+
+            },
+            required=['nombre', 'correo', 'telefono', 'mensaje']
+        )
+    )
     def post(self, request):
         if request.data.get("nombre")==None or not request.data['nombre']:
             return JsonResponse({"estado":"error", "mensaje":"El campo nombre es obligatorio"}, status=HTTPStatus.BAD_REQUEST)
